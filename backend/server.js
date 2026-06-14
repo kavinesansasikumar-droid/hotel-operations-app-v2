@@ -4,9 +4,25 @@ const axios = require('axios');
 
 const app = express();
 
-// Enable Cross-Origin Resource Sharing (CORS) for your React Frontend
+// Enable Cross-Origin Resource Sharing (CORS) for production and local environments
+const allowedOrigins = [
+  'http://localhost:5173', // Your local React setup
+  'http://localhost:3000'  // Alternative local port just in case
+];
+
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl requests, or n8n webhooks)
+    if (!origin) return callback(null, true);
+    
+    // In production, you can add your specific Vercel URL to allowedOrigins, 
+    // or keep it open/flexible for your different deployment domains:
+    if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
@@ -61,6 +77,6 @@ app.get('/api/arrivals-status', (req, res) => {
     res.status(200).json({ status: "Online", message: "Data pipes clear" });
 });
 
-// Active Port Configuration Listener
-const PORT = 4000;
+// Active Port Configuration Listener (Dynamically bound for Cloud Hosting)
+const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`🚀 Proxy server routing n8n webhooks on port ${PORT}`));

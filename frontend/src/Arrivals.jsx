@@ -1,11 +1,11 @@
-// =====================================================================
+import API_URL from './config'; // Adjust the path ('./config') depending on where you saved your config file
 // FIXED FUNCTION HANDLING SYSTEM SUBMISSIONS / INITIALIZATION SCRIPT
 // =====================================================================
-const handleSyncPipeline = async () => {
+onst handleSyncPipeline = async () => {
     try {
-        // 1. Point away from the dead placeholder and look at your local NodeJS Proxy
-        const response = await fetch('http://127.0.0.1:4000/api/arrivals', {
-            method: 'GET', // Changed from POST to GET to fetch rows safely
+        // 1. Uses the dynamic API_URL environment variable to talk to Localhost or Render
+        const response = await fetch(`${API_URL}/api/arrivals`, {
+            method: 'GET', // Kept as GET to fetch rows safely
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -17,6 +17,9 @@ const handleSyncPipeline = async () => {
 
         const baselineData = await response.json();
         console.log("🚀 Pipeline synced down cleanly through the proxy server:", baselineData);
+        
+        // Note: Remember to set your React state here with baselineData 
+        // so the new rows actually display on your hotel UI grid!
         
     } catch (error) {
         // Logs details cleanly in the F12 console instead of throwing a generic break warning
